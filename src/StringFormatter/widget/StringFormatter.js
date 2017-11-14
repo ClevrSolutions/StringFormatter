@@ -1,7 +1,16 @@
 
-dojo.provide("StringFormatter.widget.StringFormatter");
-
-dojo.declare('StringFormatter.widget.StringFormatter', mxui.widget._WidgetBase, {
+define([
+    "dojo/_base/declare",
+    "mxui/widget/_WidgetBase",
+    "dojo/dom-class",
+    "dojo/dom-attr",
+    "dojo/dom-style",
+    "dojo/dom-construct",
+    "dojo/_base/lang",
+    "dojo/date/locale",
+    "mxui/dom"
+], function (declare, _WidgetBase, domClass, domAttr, domStyle, domConstruct, lang, locale, dom) {
+    return declare("StringFormatter.widget.StringFormatter", [_WidgetBase], {
     
     _hasStarted         : false,
     _mxobj              : null,
@@ -13,22 +22,22 @@ dojo.declare('StringFormatter.widget.StringFormatter', mxui.widget._WidgetBase, 
         
         this.attributeList = this.notused;
         this._hasStarted = true;
-        dojo.addClass(this.domNode, 'stringformatter_widget');
+        domClass.add(this.domNode, 'stringformatter_widget');
         if (this.browserTooltip != null) {
-            dojo.attr(this.domNode, "title", this.browserTooltip);
+            domAttr.set(this.domNode, "title", this.browserTooltip);
         }
 
         if (this.onclickmf !== '') {
             this.connect(this.domNode, "onclick", this.execmf);
-            dojo.style(this.domNode, {cursor: "pointer"});
+            domStyle.set(this.domNode, {cursor: "pointer"});
         }
             
 
-        this.actLoaded();
+        // this.actLoaded();
     },
 
     update : function(obj, callback){
-        dojo.empty(this.domNode);
+        domConstruct.empty(this.domNode);
         
         if (!obj){
             callback && callback();
@@ -87,7 +96,7 @@ dojo.declare('StringFormatter.widget.StringFormatter', mxui.widget._WidgetBase, 
             if(guid !== ''){
                 mx.data.get({
                     guid : guid,
-                    callback : dojo.hitch(this, function(data, obj) {
+                    callback : lang.hitch(this, function(data, obj) {
                         value = self.fetchAttr(obj, data.split[2], data.htmlBool, data.oldnumber);
                         self.replaceattributes.push({ id: data.i, variable: data.listObj.variablename, value: value});
                         self.buildString();
@@ -147,15 +156,15 @@ dojo.declare('StringFormatter.widget.StringFormatter', mxui.widget._WidgetBase, 
     },
 
     renderString : function(msg) {
-        dojo.empty(this.domNode);
-        var div = mxui.dom.div( { 'class': 'stringformatter'});
+        domConstruct.empty(this.domNode);
+        var div = dom.create("div", { 'class': 'stringformatter'});
         div.innerHTML = msg;
         this.domNode.appendChild(div);
     },
 
     checkString : function (string, htmlBool) {
         if(string.indexOf("<script") > -1 || !htmlBool)
-            string = mxui.dom.escapeHTML(string);   
+            string = dom.escapeString(string);   
         return string;  
     },
 
@@ -168,7 +177,7 @@ dojo.declare('StringFormatter.widget.StringFormatter', mxui.widget._WidgetBase, 
             else if (format.timeformat !== '')
                 selector = 'time';
             
-            datevalue = dojo.date.locale.format(new Date(value), {
+            datevalue = locale.format(new Date(value), {
                 selector : selector,
                 datePattern : format.dateformat,
                 timePattern : format.timeformat
@@ -236,3 +245,5 @@ dojo.declare('StringFormatter.widget.StringFormatter', mxui.widget._WidgetBase, 
         });
     }
 });
+});
+require(["StringFormatter/widget/StringFormatter"]);
